@@ -1,23 +1,16 @@
-# Base Image
-FROM python:3.10.8-slim-buster
+FROM python:3.10-slim
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y git && \
+# Fix DNS + force IPv4 + update repos
+RUN apt-get update -o Acquire::ForceIPv4=true && \
+    apt-get install -y --no-install-recommends git ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
 COPY requirements.txt /requirements.txt
 
-# Install python packages
-RUN pip3 install --no-cache-dir -U pip && \
-    pip3 install --no-cache-dir -r /requirements.txt
+RUN pip install --no-cache-dir -U pip && \
+    pip install --no-cache-dir -r /requirements.txt
 
-# Create working directory
 WORKDIR /VJ-FILTER-BOT
-
-# Copy project files
 COPY . .
 
-# Run bot
 CMD ["python", "bot.py"]
